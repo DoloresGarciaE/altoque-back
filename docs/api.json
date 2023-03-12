@@ -1,0 +1,1535 @@
+{
+  "info": {
+    "title": "API",
+    "version": "1.0.0"
+  },
+  "openapi": "3.0.0",
+  "servers": [
+    {
+      "description": "Production server",
+      "url": "https://api.brink.trade"
+    }
+  ],
+  "paths": {
+    "/accounts/{signer}/v1": {
+      "get": {
+        "summary": "/accounts/{signer}/v1",
+        "description": "Get an account by owner (signer) address",
+        "tags": [
+          "Details"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/signerPathParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "account": {
+                      "type": "string",
+                      "format": "address"
+                    },
+                    "owner": {
+                      "type": "string",
+                      "format": "address"
+                    },
+                    "tokens": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "nft": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error. One or more parameteres are invalid.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/accounts/{signer}/bitUsed/v1": {
+      "get": {
+        "summary": "/accounts/{signer}/bitUsed/v1",
+        "description": "Checks if an order bit is used on an account",
+        "tags": [
+          "Accounts"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/signerPathParam"
+          },
+          {
+            "$ref": "#/components/parameters/bitQueryParam"
+          },
+          {
+            "$ref": "#/components/parameters/bitmapIndexQueryParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok"
+          },
+          "400": {
+            "description": "Validation error"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/nfts/v1": {
+      "get": {
+        "summary": "Collections",
+        "description": "Get a list of collections",
+        "tags": [
+          "NFT"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Number of results to return",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 20
+            }
+          },
+          {
+            "in": "query",
+            "name": "sortBy",
+            "description": "Value to sort the list by",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "1DayVolume",
+                "7DayVolume",
+                "allTimeVolume",
+                "createdAt",
+                "floorAskPrice"
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "searchText",
+            "description": "Search text to filter by. Example: `bored`",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "includeTopBid",
+            "description": "Include the top bid (offer) for the collection",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "in": "query",
+            "name": "includeInactiveCollections",
+            "description": "Include collections with 0 sales in the past 30 days",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          {
+            "in": "query",
+            "name": "hideBadDataCollections",
+            "description": "Hide collections with invalid offers and listing",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok"
+          },
+          "400": {
+            "description": "Validation error. One or more parameteres are invalid.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/estimates/nftBuy/v1": {
+      "get": {
+        "summary": "/estimates/nftBuy/v1",
+        "description": "Estimates the cost to buy 1 NFT for a collection.",
+        "tags": [
+          "NFT"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "identifier",
+            "description": "Address or slug of the collection. Example: `cryptocoven`",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "required": true,
+            "name": "network",
+            "description": "EVM network",
+            "schema": {
+              "$ref": "#/components/schemas/network"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "slug": {
+                      "type": "string"
+                    },
+                    "address": {
+                      "type": "string"
+                    },
+                    "gasPrice": {
+                      "type": "integer"
+                    },
+                    "tokenOutAmount": {
+                      "type": "string"
+                    },
+                    "estimatedGasUsed": {
+                      "type": "integer"
+                    },
+                    "estimatedGasUsedETH": {
+                      "type": "integer"
+                    },
+                    "markets": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error. One or more parameteres are invalid.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/estimates/orderCost/v1": {
+      "get": {
+        "summary": "/estimates/orderCost/v1",
+        "description": "Estimate current gas cost for an ERC20 or NFT order",
+        "tags": [
+          "Estimate Cost"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/signerQueryParam"
+          },
+          {
+            "$ref": "#/components/parameters/tokenInQueryParam"
+          },
+          {
+            "$ref": "#/components/parameters/tokenOutQueryParam"
+          },
+          {
+            "$ref": "#/components/parameters/tokenInAmountQueryParam"
+          },
+          {
+            "$ref": "#/components/parameters/tokenOutAmountQueryParam"
+          },
+          {
+            "$ref": "#/components/parameters/networkQueryParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "account": {
+                      "type": "string",
+                      "format": "address"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/estimates/swap/v1": {
+      "get": {
+        "summary": "/estimates/swap/v1",
+        "description": "Estimate cost for ERC20 swap",
+        "tags": [
+          "ERC20"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "required": true,
+            "name": "tokenIn",
+            "description": "Address of the swap input token. Examples: `ETH`, `0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2`",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "required": true,
+            "name": "tokenOut",
+            "description": "Address of the swap output token. Examples: `ETH`, `0x6b175474e89094c44da98b954eedeac495271d0f`",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "required": true,
+            "name": "tokenInAmount",
+            "description": "Exact amount of tokenIn for the swap",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "required": true,
+            "name": "network",
+            "description": "EVM network",
+            "schema": {
+              "$ref": "#/components/schemas/network"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tokenIn": {
+                      "type": "string"
+                    },
+                    "tokenOut": {
+                      "type": "string"
+                    },
+                    "tokenInAmount": {
+                      "type": "string"
+                    },
+                    "tokenOutAmount": {
+                      "type": "string"
+                    },
+                    "gasPrice": {
+                      "type": "integer"
+                    },
+                    "gasUseEstimate": {
+                      "type": "integer"
+                    },
+                    "gasUseEstimateTokenIn": {
+                      "type": "integer"
+                    },
+                    "gasUseEstimateTokenOut": {
+                      "type": "integer"
+                    },
+                    "gasUseEstimateETH": {
+                      "type": "integer"
+                    },
+                    "gasUseEstimateUSD": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error. One or more parameteres are invalid.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/nfts/{identifier}/floor/v1": {
+      "get": {
+        "summary": "Floor",
+        "description": "Gets the asset listing with the lowest price in a collection (aka Floor)",
+        "tags": [
+          "NFT"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "identifier",
+            "description": "Slug or address of the collection. Example: `cryptocoven`",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "buyer",
+            "description": "Address of buyer for route transaction data",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "required": true,
+            "name": "network",
+            "description": "EVM network",
+            "schema": {
+              "$ref": "#/components/schemas/network"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error. One or more parameteres are invalid.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/orders/{hash}/v1": {
+      "get": {
+        "summary": "Get By Hash",
+        "description": "Get an order by hash",
+        "tags": [
+          "Orders"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/hashPathParam"
+          },
+          {
+            "$ref": "#/components/parameters/includeHistoryQueryParam"
+          },
+          {
+            "$ref": "#/components/parameters/startTimeQueryParam"
+          },
+          {
+            "$ref": "#/components/parameters/endTimeQueryParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "account": {
+                      "type": "string",
+                      "format": "address"
+                    },
+                    "owner": {
+                      "type": "string",
+                      "format": "address"
+                    },
+                    "tokens": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "nft": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/orders/v1": {
+      "get": {
+        "summary": "/orders/v1",
+        "description": "Get a list of orders",
+        "tags": [
+          "Get all orders"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/networkQueryParam"
+          },
+          {
+            "$ref": "#/components/parameters/tokenQueryParam"
+          },
+          {
+            "$ref": "#/components/parameters/signerQueryParam"
+          },
+          {
+            "$ref": "#/components/parameters/ownerQueryParam"
+          },
+          {
+            "$ref": "#/components/parameters/pageQueryParam"
+          },
+          {
+            "$ref": "#/components/parameters/sizeQueryParam"
+          },
+          {
+            "$ref": "#/components/parameters/statusQueryParam"
+          },
+          {
+            "$ref": "#/components/parameters/messageTypeQueryParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "account": {
+                      "type": "string",
+                      "format": "address"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/accounts/{signer}/nextBit/v1": {
+      "get": {
+        "summary": "/accounts/{signer}/nextBit/v1",
+        "description": "Returns an account next available order bit",
+        "tags": [
+          "Accounts"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/signerPathParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok"
+          },
+          "400": {
+            "description": "Validation error"
+          },
+          "500": {
+            "description": "Internal server error"
+          }
+        }
+      }
+    },
+    "/nfts/{identifier}/bids/v1": {
+      "get": {
+        "summary": "Collection Bids (Offers)",
+        "description": "Get bids (offers) for a collection",
+        "tags": [
+          "NFT"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "required": true,
+            "name": "identifier",
+            "description": "Address or slug of the collection. Example: `cryptocoven`",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "description": "Number of results to return",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "description": "Number of result to skip before selecting.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error. One or more parameteres are invalid.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/nfts/{identifier}/buy/v1": {
+      "get": {
+        "summary": "Buy NFT's",
+        "description": "get calldata for buying one or multiple nfts",
+        "tags": [
+          "NFT"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "required": true,
+            "name": "identifier",
+            "description": "Address or slug of the collection. Example: `cryptocoven`",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "taker",
+            "description": "address of the buyer of the nfts",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "ids",
+            "description": "ID of the token to check",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error. One or more parameteres are invalid.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/nfts/search/v1": {
+      "get": {
+        "summary": "Search Collections",
+        "description": "Get collections filtered by search text",
+        "tags": [
+          "NFT"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "required": true,
+            "name": "searchText",
+            "description": "Search text to filter by. Example `bored`",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error. One or more parameteres are invalid.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/nfts/{identifier}/data/v1": {
+      "get": {
+        "summary": "Collection Metadata",
+        "description": "Get metadata for a collection",
+        "tags": [
+          "NFT"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "required": true,
+            "name": "identifier",
+            "description": "Address or slug of the collection. Example: `cryptocoven`",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error. One or more parameteres are invalid.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/nfts/{identifier}/stats": {
+      "get": {
+        "summary": "Collection Stats",
+        "description": "Get volume and sales statistics for a collection",
+        "tags": [
+          "NFT"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "required": true,
+            "name": "identifier",
+            "description": "Address or slug of the collection. Example: `cryptocoven`",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error. One or more parameteres are invalid.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/nft/{identifier}/tokens/v1": {
+      "get": {
+        "summary": "Tokens Data",
+        "description": "get metadata of certain tokens in a collection",
+        "tags": [
+          "NFT"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "required": true,
+            "name": "identifier",
+            "description": "Address or slug of the collection. Example: `cryptocoven`",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "nftIds",
+            "description": "ID of the token to check",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error. One or more parameteres are invalid.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/quotes/v1": {
+      "get": {
+        "summary": "Price Quote",
+        "description": "Get price quote for an ERC20 pair",
+        "tags": [
+          "ERC20"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "required": true,
+            "name": "tokenIn",
+            "description": "Address of the swap input token. Examples: `ETH`, `0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2`",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "required": true,
+            "name": "tokenOut",
+            "description": "Address of the swap output token. Examples: `ETH`, `0x6b175474e89094c44da98b954eedeac495271d0f`",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "required": true,
+            "name": "network",
+            "description": "EVM network",
+            "schema": {
+              "$ref": "#/components/schemas/network"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error. One or more parameteres are invalid.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/nfts/{identifier}/sell/v1": {
+      "get": {
+        "summary": "Sell",
+        "description": "Get transaction data for sale of an NFT",
+        "tags": [
+          "NFT"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "required": true,
+            "name": "identifier",
+            "description": "Address of the collection. Example: `0x5180db8f5c931aae63c74266b211f580155ecac8`",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "required": true,
+            "name": "sellerAddress",
+            "description": "Address of the seller",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "required": true,
+            "name": "tokenId",
+            "description": "NFT token ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error. One or more parameteres are invalid.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tokens/v1": {
+      "get": {
+        "summary": "Token List",
+        "description": "Get a list of commonly traded tokens",
+        "tags": [
+          "ERC20"
+        ],
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error. One or more parameteres are invalid.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BasicError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "parameters": {
+      "ownerPathParam": {
+        "in": "path",
+        "required": true,
+        "name": "owner",
+        "description": "Account owner (signer) address",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "networksQueryParam": {
+        "in": "query",
+        "required": true,
+        "name": "networks",
+        "description": "EVM network",
+        "schema": {
+          "$ref": "#/components/schemas/networks"
+        }
+      },
+      "signerPathParam": {
+        "in": "path",
+        "required": true,
+        "name": "signer",
+        "description": "Address of the account signer (owner)",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "ownerQueryParam": {
+        "in": "query",
+        "required": true,
+        "name": "owner",
+        "description": "The owner (signer) of the order",
+        "schema": {
+          "type": "string",
+          "format": "address"
+        }
+      },
+      "tokenInQueryParam": {
+        "in": "query",
+        "required": true,
+        "name": "tokenIn",
+        "description": "The input token address",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "tokenOutQueryParam": {
+        "in": "query",
+        "required": true,
+        "name": "tokenOut",
+        "description": "The output token address",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "tokenInAmountQueryParam": {
+        "in": "query",
+        "required": true,
+        "name": "tokenInAmount",
+        "description": "The input token amount",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "tokenOutAmountQueryParam": {
+        "in": "query",
+        "required": true,
+        "name": "tokenOutAmount",
+        "description": "The output token amount",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "networkQueryParam": {
+        "in": "query",
+        "required": true,
+        "name": "network",
+        "description": "EVM network",
+        "schema": {
+          "$ref": "#/components/schemas/network"
+        }
+      },
+      "accountQueryParam": {
+        "in": "query",
+        "name": "account",
+        "description": "Account address",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "tokenQueryParam": {
+        "in": "query",
+        "name": "token",
+        "description": "Token address",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "signerQueryParam": {
+        "in": "query",
+        "name": "signer",
+        "description": "The signer (owner) address",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "pageQueryParam": {
+        "in": "query",
+        "name": "page",
+        "description": "Page number to return",
+        "schema": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      "sizeQueryParam": {
+        "in": "query",
+        "name": "size",
+        "description": "Number of results per page to return",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 10
+        }
+      },
+      "statusQueryParam": {
+        "in": "query",
+        "name": "status",
+        "description": "Filter by order status",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "OPEN",
+            "CANCELED",
+            "FILLED",
+            "EXPIRED"
+          ]
+        }
+      },
+      "messageTypeQueryParam": {
+        "in": "query",
+        "name": "messageType",
+        "description": "Message type (order type)",
+        "schema": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "bitQueryParam": {
+        "in": "query",
+        "required": true,
+        "name": "bit",
+        "description": "The order bit value",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "bitmapIndexQueryParam": {
+        "in": "query",
+        "required": true,
+        "name": "bitmapIndex",
+        "description": "The order bitmapIndex value",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "hashPathParam": {
+        "in": "path",
+        "required": true,
+        "name": "hash",
+        "description": "Hash of the order",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "includeHistoryQueryParam": {
+        "in": "query",
+        "name": "includeHistory",
+        "description": "Include an array of historical price checks on the order in the response",
+        "schema": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "startTimeQueryParam": {
+        "in": "query",
+        "name": "startTime",
+        "description": "Filter historical price checks by a start time",
+        "schema": {
+          "type": "string",
+          "format": "date",
+          "example": "2022-12-02T15:11:02.970Z"
+        }
+      },
+      "endTimeQueryParam": {
+        "in": "query",
+        "name": "endTime",
+        "description": "Filter historical price checks by an end time",
+        "schema": {
+          "type": "string",
+          "example": "2022-12-02T15:11:02.970Z"
+        }
+      },
+      "functionQueryParam": {
+        "in": "query",
+        "required": true,
+        "name": "function",
+        "description": "The order verifier function name. See [brink-verifiers-v2](https://github.com/brinktrade/brink-verifiers-v2).",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "verifierQueryParam": {
+        "in": "query",
+        "required": true,
+        "name": "verifier",
+        "description": "The order verifier contract address. See [brink-verifiers-v2](https://github.com/brinktrade/brink-verifiers-v2).",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "paramsQueryParam": {
+        "in": "query",
+        "required": true,
+        "name": "params",
+        "description": "Parameters for the verifier function call",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "signedMessageQueryParam": {
+        "in": "query",
+        "required": true,
+        "name": "signedMessage",
+        "description": "Order signed message. This is an object returned by the Create endpoint with a valid EIP-712 signature added.",
+        "schema": {
+          "$ref": "#/components/schemas/SignedMessage"
+        }
+      },
+      "callDataQueryParam": {
+        "in": "query",
+        "required": true,
+        "name": "callData",
+        "description": "Call data to fill the order. This is generally a swap path that is provided by the transaction sender (executor).",
+        "schema": {
+          "type": "string",
+          "format": "bytecode"
+        }
+      }
+    },
+    "schemas": {
+      "BasicError": {
+        "type": "object",
+        "properties": {
+          "err": {
+            "type": "string"
+          }
+        }
+      },
+      "EIP712TypedData": {
+        "type": "object",
+        "properties": {
+          "types": {
+            "type": "object"
+          },
+          "domain": {
+            "type": "object"
+          },
+          "values": {
+            "type": "object"
+          }
+        }
+      },
+      "SignedMessage": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "EIP712TypedData": {
+            "$ref": "#/components/schemas/EIP712TypedData"
+          },
+          "signature": {
+            "type": "string"
+          },
+          "signer": {
+            "type": "string"
+          },
+          "accountAddress": {
+            "type": "string"
+          },
+          "functionName": {
+            "type": "string"
+          },
+          "signedParams": {
+            "type": "array",
+            "example": []
+          }
+        },
+        "required": [
+          "messge",
+          "EIP712TypedData",
+          "signature",
+          "signer",
+          "accountAddress",
+          "functionName",
+          "signedParams"
+        ]
+      },
+      "networks": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/network"
+        }
+      },
+      "network": {
+        "type": "string",
+        "enum": [
+          "mainnet"
+        ]
+      }
+    }
+  },
+  "tags": []
+}
